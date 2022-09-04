@@ -3,8 +3,7 @@ use crate::ecs::entity::Entity;
 use crate::rendering::camera::{Camera2d, Vertex};
 use crate::rendering::sprite::Sprite;
 use crate::rendering::texture::Texture;
-use std::collections::hash_map::DefaultHasher;
-use std::collections::HashMap;
+use std::collections::hash_map::{DefaultHasher, Entry};
 use std::hash::{Hash, Hasher};
 use std::sync::RwLockReadGuard;
 use wgpu::{
@@ -15,7 +14,7 @@ use wgpu::{
 
 pub struct RenderObject<'a> {
     pub pipeline: u64,
-    pub texture: &'a Box<dyn Texture>,
+    pub texture: &'a dyn Texture,
     pub transform: Option<&'a Transform2<f32>>,
 }
 impl<'a> RenderObject<'a> {
@@ -38,12 +37,10 @@ impl<'a> RenderObject<'a> {
                 sprite.shader.hash(&mut hasher);
                 sprite.shader_label.hash(&mut hasher);
                 let shader_hash = hasher.finish();
-                let pipeline = if camera.pipelines.contains_key(&shader_hash) {
-                    shader_hash
-                } else {
+                let pipeline = if let Entry::Vacant(e) = camera.pipelines.entry(shader_hash) {
                     let shader = camera.device.create_shader_module(ShaderModuleDescriptor {
                         label: Some(sprite.shader_label.as_str()),
-                        source: ShaderSource::Wgsl(sprite.shader.into()),
+                        source: ShaderSource::Wgsl(sprite.shader.as_str().into()),
                     });
                     let render_pipeline_layout =
                         camera
@@ -90,13 +87,15 @@ impl<'a> RenderObject<'a> {
                                 },
                                 multiview: None,
                             });
-                    camera.pipelines.insert(shader_hash, render_pipeline);
+                    e.insert(render_pipeline);
+                    shader_hash
+                } else {
                     shader_hash
                 };
                 RenderObject {
                     pipeline,
-                    texture: &sprite.texture,
-                    transform: transform.clone(),
+                    texture: &*sprite.texture,
+                    transform: *transform,
                 }
             })
             .collect()
