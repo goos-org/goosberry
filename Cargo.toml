@@ -1,0 +1,23 @@
+[package]
+name = "goosberry"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "goosberry"
+
+[[example]]
+name = "goosberry_example"
+path = "src/example/main.rs"
+
+[dev-dependencies]
+winit = "0.27.2"
+
+[dependencies]
+tuple_unpack = "1.0.1"
+nalgebra = "0.31.1"
+num-traits = "0.2.15"
+image = "0.24.3"
+wgpu = "0.13.1"
+raw-window-handle = "^0.4"
+bytemuck = "1.12.1"
