@@ -1,8 +1,8 @@
+use goosberry::ecs::components::Transform3;
+use goosberry::ecs::entity::Entity;
+use goosberry::ecs::game::Game;
+use goosberry::ecs::world::World;
 use std::time::Duration;
-use thing_box::ecs::components::Transform3;
-use thing_box::ecs::entity::Entity;
-use thing_box::ecs::game::Game;
-use thing_box::ecs::world::World;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::EventLoop;
 use winit::window::{Fullscreen, WindowBuilder};
