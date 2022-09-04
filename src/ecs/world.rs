@@ -4,9 +4,9 @@ use tuple_unpack::TupleUnpack;
 
 /// ## Usage
 /// ```rust
-/// # use thing_box::ecs::entity::Entity;
-/// # use thing_box::ecs::game::Game;
-/// # use thing_box::ecs::world::World;
+/// # use goosberry::ecs::entity::Entity;
+/// # use goosberry::ecs::game::Game;
+/// # use goosberry::ecs::world::World;
 /// let foo = Foo { x: 0 };
 /// let bar = Bar { x: 0 };
 ///

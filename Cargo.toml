@@ -12,6 +12,7 @@ path = "src/example/main.rs"
 
 [dev-dependencies]
 winit = "0.27.2"
+tokio = { version = "1.21.0", features = ["full"] }
 
 [dependencies]
 tuple_unpack = "1.0.1"
@@ -21,3 +22,4 @@ image = "0.24.3"
 wgpu = "0.13.1"
 raw-window-handle = "^0.4"
 bytemuck = "1.12.1"
+downcast-rs = "1.2.0"

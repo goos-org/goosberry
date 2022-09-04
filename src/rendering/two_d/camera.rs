@@ -29,6 +29,7 @@ impl Vertex {
     }
 }
 
+#[derive(Debug)]
 pub struct Camera2d {
     pub surface: Surface,
     pub device: Device,
@@ -94,25 +95,25 @@ impl Camera2d {
     }
     pub fn render(
         &mut self,
-        render_pipeline: RenderPipeline,
-        vertices: &[Vertex],
+        //render_pipeline: RenderPipeline,
+        //vertices: &[Vertex],
     ) -> Result<(), SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
             .texture
             .create_view(&TextureViewDescriptor::default());
-        let vertex_buffer = self.device.create_buffer_init(&BufferInitDescriptor {
+        /*let vertex_buffer = self.device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(vertices),
             usage: wgpu::BufferUsages::VERTEX,
-        });
+        });*/
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
         {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
@@ -129,9 +130,9 @@ impl Camera2d {
                 })],
                 depth_stencil_attachment: None,
             });
-            render_pass.set_pipeline(&render_pipeline);
-            render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
-            render_pass.draw(0..vertices.len() as u32, 0..1);
+            //render_pass.set_pipeline(&render_pipeline);
+            //render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
+            //render_pass.draw(0..vertices.len() as u32, 0..1);
         }
 
         self.queue.submit(std::iter::once(encoder.finish()));
