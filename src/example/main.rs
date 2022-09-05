@@ -2,10 +2,11 @@ use goosberry::ecs::components::Transform3;
 use goosberry::ecs::entity::Entity;
 use goosberry::ecs::game::Game;
 use goosberry::ecs::world::World;
-use goosberry::rendering::camera::Camera2d;
+use goosberry::rendering::camera::{Camera2d, CameraOptions};
 use goosberry::rendering::render_2d;
 use nalgebra::Vector2;
 use std::time::Duration;
+use wgpu::Color;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::EventLoop;
 use winit::window::{Fullscreen, WindowBuilder};
@@ -34,6 +35,10 @@ async fn main() {
         Camera2d::new(
             &window,
             Vector2::new(window.inner_size().width, window.inner_size().height),
+            CameraOptions {
+                vsync: false,
+                clear_color: Color::BLUE,
+            },
         )
         .await,
     );

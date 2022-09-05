@@ -4,7 +4,7 @@ use raw_window_handle::HasRawWindowHandle;
 use std::collections::HashMap;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
-    Backends, Device, DeviceDescriptor, Features, Instance, Queue, RenderPipeline,
+    Backends, Color, Device, DeviceDescriptor, Features, Instance, Queue, RenderPipeline,
     RequestAdapterOptions, Surface, SurfaceConfiguration, SurfaceError, TextureViewDescriptor,
     VertexBufferLayout,
 };
@@ -30,6 +30,20 @@ impl Vertex {
 }
 
 #[derive(Debug)]
+pub struct CameraOptions {
+    pub vsync: bool,
+    pub clear_color: Color,
+}
+impl Default for CameraOptions {
+    fn default() -> Self {
+        Self {
+            vsync: true,
+            clear_color: Color::BLACK,
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Camera2d {
     pub surface: Surface,
     pub device: Device,
@@ -37,9 +51,14 @@ pub struct Camera2d {
     pub config: SurfaceConfiguration,
     pub size: Vector2<u32>,
     pub pipelines: HashMap<u64, RenderPipeline>,
+    pub options: CameraOptions,
 }
 impl Camera2d {
-    pub async fn new<T: HasRawWindowHandle>(window: &T, size: Vector2<u32>) -> Self {
+    pub async fn new<T: HasRawWindowHandle>(
+        window: &T,
+        size: Vector2<u32>,
+        options: CameraOptions,
+    ) -> Self {
         let instance = Instance::new(Backends::all());
         let surface = unsafe { instance.create_surface(window) };
         let adapter = instance
@@ -70,7 +89,10 @@ impl Camera2d {
             format: surface.get_supported_formats(&adapter)[0],
             width: size.x,
             height: size.y,
-            present_mode: wgpu::PresentMode::Fifo,
+            present_mode: match options.vsync {
+                true => wgpu::PresentMode::Fifo,
+                false => wgpu::PresentMode::Immediate,
+            },
         };
         surface.configure(&device, &config);
         Self {
@@ -80,6 +102,7 @@ impl Camera2d {
             config,
             size,
             pipelines: HashMap::new(),
+            options,
         }
     }
     pub fn resize(&mut self, size: Vector2<u32>) {
@@ -89,9 +112,6 @@ impl Camera2d {
             self.config.height = size.y;
             self.surface.configure(&self.device, &self.config);
         }
-    }
-    pub fn update(&mut self) {
-        todo!()
     }
     pub fn render(
         &mut self,
@@ -119,12 +139,7 @@ impl Camera2d {
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
-                        }),
+                        load: wgpu::LoadOp::Clear(self.options.clear_color),
                         store: true,
                     },
                 })],
