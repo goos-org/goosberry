@@ -2,7 +2,7 @@ use crate::ecs::components::Transform2;
 use crate::ecs::entity::Entity;
 use crate::rendering::camera::{Camera2d, Vertex};
 use crate::rendering::sprite::Sprite;
-use crate::rendering::texture::Texture;
+use image::{ImageBuffer, Rgba};
 use std::collections::hash_map::{DefaultHasher, Entry};
 use std::hash::{Hash, Hasher};
 use std::sync::RwLockReadGuard;
@@ -14,7 +14,7 @@ use wgpu::{
 
 pub struct RenderObject<'a> {
     pub pipeline: u64,
-    pub texture: &'a dyn Texture,
+    pub texture: ImageBuffer<Rgba<f32>, Vec<f32>>,
     pub transform: Option<&'a Transform2<f32>>,
 }
 impl<'a> RenderObject<'a> {
@@ -94,7 +94,7 @@ impl<'a> RenderObject<'a> {
                 };
                 RenderObject {
                     pipeline,
-                    texture: &*sprite.texture,
+                    texture: sprite.texture.complete(),
                     transform: *transform,
                 }
             })
